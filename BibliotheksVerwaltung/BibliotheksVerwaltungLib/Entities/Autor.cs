@@ -12,14 +12,14 @@ public class Autor
             
     }
 
-    public Autor(string titel, string vorname, string nachname)
+    public Autor(string? titel, string vorname, string nachname)
     {
         Titel= titel;
         Vorname = vorname;
         Nachname = nachname;
     }
 
-    public void Update(string titel, string vorname, string nachname)
+    public void Update(string? titel, string vorname, string nachname)
     {
         Titel = titel;
         Vorname = vorname;
