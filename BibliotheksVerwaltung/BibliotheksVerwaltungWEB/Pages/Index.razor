@@ -1,2 +1,11 @@
 ﻿@page "/"
+@using BibliotheksVerwaltungLib.Interfaces;
+@inject IAutorService autorService
 <h1>Hello, world!</h1>
+
+@code{
+    protected override async Task OnInitializedAsync()
+    {
+        await autorService.CreateAsync(new());
+    }
+}
