@@ -57,5 +57,11 @@ namespace BibliotheksVerwaltungAPI.Controllers
                 Autor = _Mapper.Map<AutorDto>(new Autor(request.Titel, request.Vorname, request.Nachname))
             };
         }
+
+        [HttpDelete("/{autorId}")]
+        public void Delete([FromRoute] int autorId)
+        {
+            
+        }
     }
 }
