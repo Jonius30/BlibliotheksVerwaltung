@@ -17,7 +17,7 @@ namespace BibliotheksVerwaltungWEB.Services
         }
         public async Task<AutorDto> CreateAsync(AutorCreateRequest request)
         {
-            StringContent content = new(JsonSerializer.Serialize(request));
+            StringContent content = new(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json");
             HttpResponseMessage result = await _HttpClient.PostAsync(ApiRessource, content);
             AutorDto? autor = JsonSerializer.Deserialize<AutorDto>(await result.Content.ReadAsStringAsync(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             return autor ?? new();
