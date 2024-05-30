@@ -31,7 +31,7 @@ namespace BibliotheksVerwaltungAPI.Controllers
             };
         }
 
-        [HttpGet("/{AutorId}")]
+        [HttpGet("{AutorId}")]
         public AutorByIdResponse GetByID([FromRoute] AutorByIdRequest request)
         {
             AutorByIdResponse response = new();
@@ -58,7 +58,7 @@ namespace BibliotheksVerwaltungAPI.Controllers
             };
         }
 
-        [HttpDelete("/{autorId}")]
+        [HttpDelete("{autorId}")]
         public void Delete([FromRoute] int autorId)
         {
             
