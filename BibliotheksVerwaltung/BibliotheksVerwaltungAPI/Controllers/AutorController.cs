@@ -4,6 +4,7 @@ using BibliotheksVerwaltungLib.Models.Dtos;
 using BibliotheksVerwaltungLib.Models.Request;
 using BibliotheksVerwaltungLib.Models.Response;
 using Microsoft.AspNetCore.Mvc;
+using MySqlConnector;
 
 namespace BibliotheksVerwaltungAPI.Controllers
 {
@@ -18,17 +19,28 @@ namespace BibliotheksVerwaltungAPI.Controllers
         }
 
         [HttpGet]
-        public AutorListResponse List()
+        public async Task<AutorListResponse> List()
         {
-            List<Autor> list = new()
+            List<Autor> autoren = new List<Autor>();
+            MySqlConnection connection = new MySqlConnection("connectionstring");
+            string commandText = "SELECT Id, Titel, Vorname, Nachname FROM Autor";
+            MySqlCommand command = new MySqlCommand(commandText, connection);
+            await connection.OpenAsync();
+            MySqlDataReader reader = await command.ExecuteReaderAsync();
+            while (reader.Read())
             {
-               new Autor(null, "Peter", "Lustig"),
-               new Autor("Dr", "Günther", "Mustermann")
-            };
-            return new()
-            {
-                Autoren = _Mapper.Map<List<AutorDto>>(list)
-            };
+                int id = reader.GetInt32("Id");
+                string titel = reader.GetString("Titel");
+                string vorname = reader.GetString("Vorname");
+                string nachname = reader.GetString("Nachname");
+                autoren.Add(new Autor(id, titel, vorname, nachname));
+
+            }
+            await command.DisposeAsync();
+            await connection.CloseAsync();
+            AutorListResponse response = new AutorListResponse();
+            response.Autoren = _Mapper.Map<List<AutorDto>>(autoren);
+            return response;
         }
 
         [HttpGet("{AutorId}")]
@@ -41,12 +53,33 @@ namespace BibliotheksVerwaltungAPI.Controllers
         }
 
         [HttpPost]
-        public AutorCreateResponse Create(AutorCreateRequest request)
+        public async Task<AutorCreateResponse> Create(AutorCreateRequest request)
         {
-            return new AutorCreateResponse()
+            MySqlConnection connection = new MySqlConnection("connectionstring");
+            string commandText = $"INSERT INTO autor (titel, vorname, nachname) VALUES (@titel, @vorname, @nachname)";
+            MySqlCommand command = new MySqlCommand(commandText, connection);
+            command.Parameters.AddWithValue("@titel", request.Titel);
+            command.Parameters.AddWithValue("@vorname", request.Vorname);
+            command.Parameters.AddWithValue("@nachname", request.Nachname);
+            await connection.OpenAsync();
+            await command.ExecuteNonQueryAsync();
+            await command.DisposeAsync();
+            AutorCreateResponse response = new AutorCreateResponse();
+            MySqlCommand commandCheck = new MySqlCommand("SELECT Id, Titel, Vorname, Nachname FROM Autor ORDER BY Id DESC LIMIT 1");
+            MySqlDataReader reader = await commandCheck.ExecuteReaderAsync();
+           
+            while (reader.Read())
             {
-                Autor = _Mapper.Map<AutorDto>(new Autor(request.Titel, request.Vorname, request.Nachname))
-            };
+                int id = reader.GetInt32("Id");
+                string titel = reader.GetString("Titel");
+                string vorname = reader.GetString("Vorname");
+                string nachname = reader.GetString("Nachname");
+                Autor autor = new Autor(id, titel, vorname, nachname);
+                response.Autor = _Mapper.Map<AutorDto>(autor);
+            }
+            await connection.CloseAsync();
+            return response;
+            
         }
 
         [HttpPut]
