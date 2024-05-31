@@ -1,4 +1,4 @@
-﻿namespace BibliotheksVerwaltungLib.Entities;
+namespace BibliotheksVerwaltungLib.Entities;
 
 public class Autor
 {
@@ -21,6 +21,14 @@ public class Autor
 
     public void Update(string? titel, string vorname, string nachname)
     {
+        Titel = titel;
+        Vorname = vorname;
+        Nachname = nachname;
+    }
+
+    public Autor(int id, string? titel, string vorname, string nachname)
+    {
+        Id = id;
         Titel = titel;
         Vorname = vorname;
         Nachname = nachname;
