@@ -22,12 +22,12 @@ namespace BibliotheksVerwaltungAPI.Controllers
         public async Task<AutorListResponse> List()
         {
             List<Autor> autoren = new List<Autor>();
-            MySqlConnection connection = new MySqlConnection("connectionstring");
+            MySqlConnection connection = new MySqlConnection("Server=localhost;User=root;Password=;database=bibliothekverwaltung");
             string commandText = "SELECT Id, Titel, Vorname, Nachname FROM Autor";
             MySqlCommand command = new MySqlCommand(commandText, connection);
             await connection.OpenAsync();
             MySqlDataReader reader = await command.ExecuteReaderAsync();
-            while (reader.Read())
+            while (await reader.ReadAsync())
             {
                 int id = reader.GetInt32("Id");
                 string titel = reader.GetString("Titel");
@@ -55,7 +55,7 @@ namespace BibliotheksVerwaltungAPI.Controllers
         [HttpPost]
         public async Task<AutorCreateResponse> Create(AutorCreateRequest request)
         {
-            MySqlConnection connection = new MySqlConnection("connectionstring");
+            MySqlConnection connection = new MySqlConnection("Server=localhost;User=root;Password=;database=bibliothekverwaltung");
             string commandText = $"INSERT INTO autor (titel, vorname, nachname) VALUES (@titel, @vorname, @nachname)";
             MySqlCommand command = new MySqlCommand(commandText, connection);
             command.Parameters.AddWithValue("@titel", request.Titel);
@@ -65,10 +65,10 @@ namespace BibliotheksVerwaltungAPI.Controllers
             await command.ExecuteNonQueryAsync();
             await command.DisposeAsync();
             AutorCreateResponse response = new AutorCreateResponse();
-            MySqlCommand commandCheck = new MySqlCommand("SELECT Id, Titel, Vorname, Nachname FROM Autor ORDER BY Id DESC LIMIT 1");
+            MySqlCommand commandCheck = new MySqlCommand("SELECT Id, Titel, Vorname, Nachname FROM Autor ORDER BY Id DESC LIMIT 1", connection);
             MySqlDataReader reader = await commandCheck.ExecuteReaderAsync();
            
-            while (reader.Read())
+            while (await reader.ReadAsync())
             {
                 int id = reader.GetInt32("Id");
                 string titel = reader.GetString("Titel");
